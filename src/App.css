@@ -1,0 +1,102 @@
+@font-face {
+  font-family: "Alexandria";
+  src: url("./assets/Alexandria/static/Alexandria-Regular.ttf");
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("./assets/Outfit/static/Outfit-Regular.ttf");
+}
+
+body {
+  font-family: Alexandria, Outfit;
+  background-color: #fefdf2;
+}
+
+.header {
+  color: #001f3f;
+  text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.1);
+
+  font-size: 32px;
+  font-family: "Alexandria";
+  font-weight: normal;
+}
+
+.title {
+  color: #001f3f;
+  font-size: 24px;
+  font-family: "Alexandria";
+  font-weight: normal;
+}
+
+.orange-bg {
+  background: #ff851b;
+  color: #ffffff;
+}
+
+.orange-bg:hover {
+  background: #ff7f00;
+  color: #ffffff;
+}
+
+.orange {
+  color: #ff851b;
+}
+
+.margin-x-16 {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.margin-y-16 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.margin-y-32 {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.margin-x-8 {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+.App {
+  padding: 20px;
+}
+
+.restaurant-text {
+  font-family: "Alexandria";
+  text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+  font-size: 32px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 133, 27, 1) 16%,
+    rgba(244, 114, 39, 1) 39%,
+    rgba(226, 35, 38, 1) 63%
+  );
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+}
+
+.list-item {
+  color: #001f3f;
+  font-size: 16px;
+  font-family: "Alexandria";
+  font-weight: normal;
+}
+
+.list-item-container {
+  background-color: white;
+  border: 1px solid black;
+  width: 75vw;
+}
+
+@media (min-width: 768px) {
+  .list-item-container {
+    width: 40vw;
+  }
+}
