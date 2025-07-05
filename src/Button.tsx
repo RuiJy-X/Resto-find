@@ -8,7 +8,8 @@ export default function Button(props: Props) {
     <>
       <button
         className="btn orange-bg shadow text-white text-center py-2 px-3 rounded-3"
-        type="button"
+        type="submit"
+        onClick={props.onClick}
       >
         {props.text}
       </button>

@@ -1,20 +1,15 @@
-import { useState } from "react";
 import ListItem from "./ListItem";
-export default function RestaurantList() {
-  const [suggestions] = useState<string[]>([
-    "Apple",
-    "Banana",
-    "Cherry",
-    "Grape",
-    "Mango",
-    "Orange",
-    "Peach",
-    "Strawberry",
-  ]);
+
+interface Props {
+  restaurants: string[];
+}
+export default function RestaurantList(props: Props) {
+  const suggestions = props.restaurants;
+
   return (
     <div className="d-flex flex-column justify-content-center align-items-center margin-y-16">
-      {suggestions.map((suggestion) => (
-        <ListItem text={suggestion} />
+      {suggestions.map((suggestion, index) => (
+        <ListItem text={suggestion} key={index} />
       ))}
     </div>
   );

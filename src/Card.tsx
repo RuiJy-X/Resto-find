@@ -1,65 +1,76 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./Button";
 import supabase from "./supbase-client.ts";
 
 export default function Card() {
   const [query, setQuery] = useState<string>("");
   const [restaurant, setRestaurant] = useState<string>("");
+
+  // Fetch initial suggestions from the database
+  const fetchSuggestions = async () => {
+    const { data, error } = await supabase.from("Locations").select("location");
+
+    if (error) {
+      console.error("Error fetching data:", error);
+    } else {
+      const names = data.map((item) => item.location);
+      setSuggestions(names);
+    }
+  };
+
   const addRestaurant = async () => {
+    console.log("Adding restaurant:", restaurant, "at location:", query);
     let locationId: number | null = null;
+    //Check for location
     const { data, error } = await supabase
       .from("Locations")
       .select("id")
-      .eq("name", query)
+      .eq("location", query)
       .single();
-
+    // If location exists, get its ID
     if (error) {
       console.error("Error fetching data:", error);
     } else {
       locationId = data?.id;
     }
 
+    // If location does not exist, create it
     if (!locationId) {
       const { data, error } = await supabase
         .from("Locations")
         .insert({
-          name: query,
+          location: query,
         })
         .select("id")
         .single();
-
+      // If there is an error fetching data, log it
+      // If location was created successfully, get its ID
       if (error) {
         console.error("Error fetching data:", error);
       } else {
         locationId = data?.id;
       }
     }
-
+    // Insert the restaurant with the location ID
     const { data: restaurantData, error: restaurantError } = await supabase
       .from("Restaurants")
       .insert({
         name: restaurant,
-        locationId: locationId,
+        location: locationId,
       });
-
+    // If there is an error fetching data, log it
+    // If restaurant was created successfully, add it to suggestions
     if (restaurantError) {
       console.error("Error fetching data:", restaurantError);
     } else {
+      fetchSuggestions();
       setSuggestions([...suggestions, restaurant]);
       setQuery("");
       setRestaurant("");
     }
   };
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "Apple",
-    "Banana",
-    "Cherry",
-    "Grape",
-    "Mango",
-    "Orange",
-    "Peach",
-    "Strawberry",
-  ]);
+
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const handleRestaurant = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +97,11 @@ export default function Card() {
     setQuery(value);
     setShowDropdown(false);
   };
+
+  useEffect(() => {
+    console.log("Fetching suggestions from database...");
+    fetchSuggestions();
+  }, []);
 
   return (
     <div className="margin-y-32 d-flex flex-row justify-content-center">

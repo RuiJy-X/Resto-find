@@ -1,18 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "./Button";
-
-export default function Search() {
+import supabase from "./supbase-client.ts";
+interface Props {
+  mode: string;
+  setSelectedRestaurant?: (restaurant: string) => void;
+  setAllRestaurants?: (restaurants: string[]) => void;
+}
+export default function Search(props: Props) {
   const [query, setQuery] = useState<string>("");
-  const suggestions = [
-    "Apple",
-    "Banana",
-    "Cherry",
-    "Grape",
-    "Mango",
-    "Orange",
-    "Peach",
-    "Strawberry",
-  ];
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
@@ -35,6 +31,93 @@ export default function Search() {
   const handleSelect = (value: string) => {
     setQuery(value);
     setShowDropdown(false);
+  };
+
+  const fetchLocations = async () => {
+    const { data, error } = await supabase.from("Locations").select("location");
+
+    if (error) {
+      console.error("Error fetching data:", error);
+    } else {
+      const names = data.map((item) => item.location);
+      setSuggestions(names);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Fetching suggestions...");
+    fetchLocations();
+  }, []);
+
+  const handleSearch = async () => {
+    // This function can be used to handle the search action
+    // if Random, it should fetching a random restaurant from the database using the location inputted (query)
+    if (props.mode == "random") {
+      //first get locationID if query is equal to location inside the database
+      const { data, error } = await supabase
+        .from("Locations")
+        .select("id")
+        .eq("location", query)
+        .single();
+      if (error) {
+        console.error("Error fetching location ID:", error);
+      } else if (data) {
+        const locationId = data.id;
+        // Now fetch a random restaurant from the database using the location ID
+        const { data: restaurantData, error: restaurantError } = await supabase
+          .from("Restaurants")
+          .select("name")
+          .eq("location", locationId);
+
+        if (restaurantError) {
+          console.error("Error fetching random restaurant:", restaurantError);
+        } else if (restaurantData) {
+          if (props.setSelectedRestaurant) {
+            // Extract all restaurant names into an array
+            const restaurantNames = restaurantData.map((r) => r.name);
+
+            if (restaurantNames.length === 0) {
+              alert("No restaurants found for this location.");
+              return;
+            }
+
+            // Randomly select one restaurant
+            const randomRestaurant =
+              restaurantNames[
+                Math.floor(Math.random() * restaurantNames.length)
+              ];
+
+            // Set it using the parent's setter
+            props.setSelectedRestaurant(randomRestaurant);
+          }
+        }
+      }
+    } else if (props.mode == "list-all") {
+      // If mode is list-all, we can fetch all restaurants from the database
+      const { data, error } = await supabase
+        .from("Locations")
+        .select("id")
+        .eq("location", query)
+        .single();
+      if (error) {
+        console.error("Error fetching location ID:", error);
+      } else if (data) {
+        const locationId = data.id;
+        // Now fetch all restaurants from the database using the location ID
+        const { data: restaurantData, error: restaurantError } = await supabase
+          .from("Restaurants")
+          .select("name")
+          .eq("location", locationId);
+
+        if (restaurantError) {
+          console.error("Error fetching all restaurants:", restaurantError);
+        } else if (restaurantData) {
+          if (props.setAllRestaurants) {
+            props.setAllRestaurants(restaurantData.map((item) => item.name));
+          }
+        }
+      }
+    }
   };
 
   return (
@@ -101,7 +184,7 @@ export default function Search() {
       </div>
 
       <div className="d-flex flex-row justify-content-center mx-2 margin-y-16">
-        <Button text="Search" />
+        <Button text="Search" onClick={handleSearch} />
       </div>
     </div>
   );
