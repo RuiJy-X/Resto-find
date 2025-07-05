@@ -62,7 +62,7 @@ export default function Card() {
     // If restaurant was created successfully, add it to suggestions
     if (restaurantError) {
       console.error("Error fetching data:", restaurantError);
-    } else {
+    } else if (restaurantData) {
       fetchSuggestions();
       setSuggestions([...suggestions, restaurant]);
       setQuery("");
